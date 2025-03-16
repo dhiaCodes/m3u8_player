@@ -3,6 +3,9 @@
 A Flutter package that provides a customizable M3U8 player for both mobile and web platforms.
 
 ![image](https://github.com/user-attachments/assets/c1151144-3daf-4107-9401-b13fd11ddf25)
+![WhatsApp Image 2025-03-15 at 20 02 48](https://github.com/user-attachments/assets/a6155764-a998-4105-9806-3d3ce79007eb)
+![WhatsApp Image 2025-03-15 at 20 02 49](https://github.com/user-attachments/assets/1fd392bc-fd76-47f5-8303-9a6c7b4dc43e)
+
 
 
 
