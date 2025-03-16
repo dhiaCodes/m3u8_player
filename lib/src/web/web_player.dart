@@ -27,7 +27,11 @@ class M3u8Player implements PlayerInterface {
   final Function(Duration) onBufferedChanged;
   final Function(bool)? onFullscreenChanged;
   bool _isInitialized = false;
+  bool _hasCompleted = false;
+  double _completedPercentage = 1.0; // Default to 100%
+  Function()? _onCompleted;
 
+  // Novo: Aceita onCompleted e completedPercentage via construtor.
   M3u8Player({
     required this.onQualitiesUpdated,
     required this.onQualityChanged,
@@ -35,7 +39,12 @@ class M3u8Player implements PlayerInterface {
     required this.onPositionChanged,
     required this.onBufferedChanged,
     this.onFullscreenChanged,
+    Function()? onCompleted,
+    double completedPercentage = 1.0,
   }) {
+    _onCompleted = onCompleted;
+    _completedPercentage = completedPercentage;
+
     _videoElement = html.VideoElement()
       ..style.width = '100%'
       ..style.height = '100%'
@@ -181,6 +190,16 @@ class M3u8Player implements PlayerInterface {
       if ((_videoElement?.buffered.length ?? 0) > 0) {
         final buffered = _videoElement!.buffered.end(_videoElement!.buffered.length - 1);
         onBufferedChanged(Duration(milliseconds: (buffered * 1000).toInt()));
+      }
+      // Verifica se a porcentagem de conclusão foi atingida e chama onCompleted.
+      if (!_hasCompleted &&
+          _videoElement != null &&
+          _videoElement!.duration > 0) {
+        double progress = _videoElement!.currentTime / _videoElement!.duration;
+        if (progress >= _completedPercentage) {
+          _hasCompleted = true;
+          _onCompleted?.call();
+        }
       }
     });
   }

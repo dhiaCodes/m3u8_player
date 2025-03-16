@@ -55,6 +55,10 @@ class _MyHomePageState extends State<MyHomePage> {
               onProgressUpdate: (position) {
                 print('Posição atual: ${position.inSeconds} segundos');
               },
+              completedPercentage: 0.95,
+              onCompleted:(){
+                print('Video completo');
+              },
               onFullscreenChanged: _onFullScreenChanged,
               theme: const PlayerTheme(
                 primaryColor: Colors.white,

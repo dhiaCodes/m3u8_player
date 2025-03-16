@@ -99,6 +99,8 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget> with WidgetsBinding
           widget.config.onFullscreenChanged!(isFullscreen);
         }
       },
+      onCompleted: widget.config.onCompleted,
+      completedPercentage: widget.config.completedPercentage,
     );
 
     await _player.initialize(widget.config.url);

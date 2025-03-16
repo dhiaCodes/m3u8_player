@@ -8,14 +8,13 @@ abstract class PlayerInterface {
   void setQuality(String quality);
   void dispose();
 
-  /// No web, esse getter retorna o identificador para o HtmlElementView.
-  /// No mobile, retorna o controller usado pelo widget VideoPlayer.
+  /// Controller usado pelo widget do player.
   dynamic get controller;
 
-  /// Para web, retorna o viewId; para mobile, pode retornar uma string vazia.
+  /// Identificador para a view, usado na web e mobile.
   String get viewId;
 
-  /// Métodos de fullscreen (poderão ser no-op no mobile)
+  /// Métodos de controle de fullscreen.
   void enterFullscreen();
   void exitFullscreen();
 }

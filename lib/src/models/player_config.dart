@@ -21,11 +21,17 @@ class PlayerConfig {
   /// Intervalo em segundos para o callback de progresso
   final int progressCallbackInterval;
 
+  /// Porcentagem para dar o vídeo como completo
+  final double completedPercentage;
+
   /// Callback de atualização de progresso
   final void Function(Duration position)? onProgressUpdate;
 
   /// Callback de mudança de tela cheia
   final Function(bool)? onFullscreenChanged;
+
+  /// Callback quando o vídeo alcança 95% de progresso
+  final Function()? onCompleted;
 
   /// Tema do player
   final PlayerTheme theme;
@@ -39,6 +45,8 @@ class PlayerConfig {
     this.progressCallbackInterval = 1,
     this.onProgressUpdate,
     this.onFullscreenChanged,
+    this.onCompleted,
+    this.completedPercentage = 1.0,
     this.theme = const PlayerTheme(),
   });
-} 
+}

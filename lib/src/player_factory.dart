@@ -8,13 +8,17 @@ PlayerInterface createPlayer({
   required Function(Duration) onPositionChanged,
   required Function(Duration) onBufferedChanged,
   Function(bool)? onFullscreenChanged,
+  Function()? onCompleted,
+  double completedPercentage = 1.0,
 }) {
-  return M3u8Player( // Note o nome unificado!
+  return M3u8Player(
     onQualitiesUpdated: onQualitiesUpdated,
     onQualityChanged: onQualityChanged,
     onDurationChanged: onDurationChanged,
     onPositionChanged: onPositionChanged,
     onBufferedChanged: onBufferedChanged,
     onFullscreenChanged: onFullscreenChanged,
+    onCompleted: onCompleted,
+    completedPercentage: completedPercentage,
   );
 }

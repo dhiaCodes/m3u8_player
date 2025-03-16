@@ -2,6 +2,10 @@
 
 A Flutter package that provides a customizable M3U8 player for both mobile and web platforms.
 
+![image](https://github.com/user-attachments/assets/c1151144-3daf-4107-9401-b13fd11ddf25)
+
+
+
 ## Features
 
 - **Cross-platform Support**: Compatible with Android, iOS, and Web.
@@ -20,7 +24,7 @@ Add `m3u8_player` to your project's `pubspec.yaml`:
 dependencies:
   m3u8_player:
     git:
-      url: https://github.com/your-repo/m3u8_player.git
+      url: https://github.com/MendesCorporation/m3u8_player.git
 ```
 
 Then run:
