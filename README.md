@@ -16,6 +16,7 @@ A Flutter package that provides a customizable M3U8 player for both mobile and w
 - **Playback Controls**: Play, pause, seek, adjust volume, playback speed, and quality of the stream.
 - **Fullscreen Mode**: Toggle fullscreen mode seamlessly.
 - **Progress Callbacks**: Receive progress updates at specified intervals.
+- **Completion Callback and Threshold**: The player triggers an onCompleted callback when the playback reaches the specified completedPercentage (a value between 0 and 1; e.g., 1.0 indicates full completion).
 
 ## Getting Started
 
