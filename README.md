@@ -65,6 +65,10 @@ PlayerConfig config = PlayerConfig(
     // Handle fullscreen change
     print('Fullscreen mode: $isFullscreen');
   },
+  completedPercentage: 0.95,
+  onCompleted:(){
+  print('Video completo');
+  },
   theme: PlayerTheme(
     primaryColor: Colors.blue,
     backgroundColor: Colors.black,
@@ -140,6 +144,8 @@ Configuration options for initializing the player.
 - **progressCallbackInterval**: `int` - Interval in seconds for the progress callback. Default is `1`.
 - **onProgressUpdate**: `void Function(Duration)` - Callback for progress updates.
 - **onFullscreenChanged**: `Function(bool)?` - Callback for fullscreen state changes.
+- **onCompleted**: `Function(bool)?` - Callback for completed watch video.
+- **completedPercentage**: `double` - value 0 to 1 for considering completed video.
 - **theme**: `PlayerTheme` - Defines theming options for the player.
 
 ### PlayerTheme
