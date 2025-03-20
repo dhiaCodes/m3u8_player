@@ -1,7 +1,7 @@
 name: m3u8_player
-description: Um player HLS (m3u8) para Flutter com suporte a Web, Android e iOS
-version: 0.0.1
-homepage: https://github.com/seu_usuario/m3u8_player
+description: A Flutter package that provides a customizable M3U8 player for both mobile and web platforms.
+version: 0.0.2
+homepage: https://github.com/MendesCorporation/m3u8_player
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -9,6 +9,8 @@ environment:
 
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_web_plugins:
     sdk: flutter
   video_player: ^2.8.1
   video_player_web: ^2.1.2
@@ -30,6 +32,11 @@ dev_dependencies:
 flutter:
   plugin:
     platforms:
+      android:
+        package: m3u8_player
+        pluginClass: M3u8Player
+      ios:
+        pluginClass: M3u8Player
       web:
         pluginClass: M3u8Player
         fileName: src/web/web_player.dart

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'player_theme.dart';
 
 /// Configuração do player M3U8

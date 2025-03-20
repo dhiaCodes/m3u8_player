@@ -48,7 +48,6 @@ class M3u8Player implements PlayerInterface {
           position.inMilliseconds >= (_completedPercentage * duration.inMilliseconds).toInt()) {
         _hasCompleted = true;
         _onCompleted?.call();
-        print('Vídeo completado com base na porcentagem: $_completedPercentage');
       }
     });
 
@@ -67,7 +66,7 @@ class M3u8Player implements PlayerInterface {
   }
 
   @override
-  String get viewId => ''; // Não usado no mobile
+  String get viewId => ''; // Não usado no mobilefl
 
   @override
   Future<void> initialize(String url) async {
