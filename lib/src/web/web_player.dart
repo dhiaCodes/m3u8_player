@@ -77,14 +77,21 @@ class M3u8Player implements PlayerInterface {
 
   @override
   Future<void> initialize(String url) async {
-    if (!js_util.hasProperty(window, 'Hls')) return;
-
+    html.window.console.log("DEBUG: initialize called with url: " + url);
+    if (!js_util.hasProperty(window, 'Hls')) {
+      html.window.console.error("DEBUG: window.Hls not found");
+      return;
+    }
+    
     final isSupported = js_util.callMethod(
       js_util.getProperty(window, 'Hls'),
       'isSupported',
       [],
     );
-    if (!isSupported) return;
+    if (!isSupported) {
+      html.window.console.error("DEBUG: Hls is not supported in this browser");
+      return;
+    }
 
     final hlsConfig = js_util.jsify({
       'debug': false,

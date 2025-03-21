@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased] - 2025-03-21
+## [0.0.3] - 2025-03-21
 
 ### Git Changelog
 - Implemented core functionalities for m3u8 player.
