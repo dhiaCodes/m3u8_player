@@ -105,7 +105,7 @@ class _PlayerControlsState extends State<PlayerControls> {
   /// Botão de velocidade (PopupMenu) que mostra as opções de playbackSpeed.
   Widget _buildSpeedButton() {
     return PopupMenuButton<double>(
-      tooltip: 'Velocidade de reprodução',
+      tooltip: 'Velocidade de reproduçã',
       onSelected: widget.onSpeedChanged,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       color: widget.theme.backgroundColor.withOpacity(0.95),
