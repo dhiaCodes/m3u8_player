@@ -42,9 +42,10 @@ class M3u8Player implements PlayerInterface {
     Function()? onCompleted,
     double completedPercentage = 1.0,
   }) {
+    print("DEBUG: M3u8Player constructor chamado");
     _onCompleted = onCompleted;
     _completedPercentage = completedPercentage;
-
+ 
     _videoElement = html.VideoElement()
       ..style.width = '100%'
       ..style.height = '100%'
@@ -77,14 +78,34 @@ class M3u8Player implements PlayerInterface {
 
   @override
   Future<void> initialize(String url) async {
-    if (!js_util.hasProperty(window, 'Hls')) return;
-
+    if (!js_util.hasProperty(window, 'Hls')) {
+      final completer = Completer<void>();
+      final script = html.ScriptElement()
+        ..src = "https://cdn.jsdelivr.net/npm/hls.js@latest"
+        ..type = "text/javascript";
+      script.onLoad.listen((_) {
+         completer.complete();
+      });
+      script.onError.listen((_) {
+         completer.completeError("Error loading hls.js");
+      });
+      html.document.head?.append(script);
+      try {
+         await completer.future;
+      } catch(e) {
+         html.window.console.error("DEBUG: hls.js dynamic load failed: $e");
+         return;
+      }
+    }
+    
     final isSupported = js_util.callMethod(
       js_util.getProperty(window, 'Hls'),
       'isSupported',
       [],
     );
-    if (!isSupported) return;
+    if (!isSupported) {
+      return;
+    }
 
     final hlsConfig = js_util.jsify({
       'debug': false,

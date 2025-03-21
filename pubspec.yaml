@@ -1,6 +1,6 @@
 name: m3u8_player
 description: A Flutter package that provides a customizable M3U8 player for both mobile and web platforms.
-version: 0.0.2
+version: 0.0.4
 homepage: https://github.com/MendesCorporation/m3u8_player
 
 environment:
@@ -19,6 +19,7 @@ dependencies:
   provider: ^6.1.1
   screen_brightness_platform_interface: ^2.0.0
   wakelock_plus: ^1.2.10
+  http: ^0.13.5
 
 dev_dependencies:
   flutter_test:
@@ -38,6 +39,8 @@ flutter:
       web:
         pluginClass: M3u8Player
         fileName: src/web/web_player.dart
+      ios:
+        pluginClass: M3u8Player
 
   # To add assets to your package, add an assets section, like this:
   # assets:
