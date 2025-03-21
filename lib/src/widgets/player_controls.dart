@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/player_theme.dart';
 
+
 /// Widget principal de controles do player.
 class PlayerControls extends StatefulWidget {
   final bool isPlaying;

@@ -35,8 +35,6 @@ flutter:
       android:
         package: m3u8_player
         pluginClass: M3u8Player
-      ios:
-        pluginClass: M3u8Player
       web:
         pluginClass: M3u8Player
         fileName: src/web/web_player.dart
