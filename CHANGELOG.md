@@ -1,6 +1,10 @@
 # Changelog
 
-## [0.0.3] - 2025-03-21
+## [v0.0.4] - 2025-03-21
+
+    - Fixed web player.
+
+## [v0.0.3] - 2025-03-21
 
 ### Git Changelog
 - Implemented core functionalities for m3u8 player.
