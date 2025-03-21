@@ -42,7 +42,6 @@ class M3u8Player implements PlayerInterface {
     Function()? onCompleted,
     double completedPercentage = 1.0,
   }) {
-    print("DEBUG: M3u8Player constructor chamado");
     _onCompleted = onCompleted;
     _completedPercentage = completedPercentage;
  
@@ -184,7 +183,7 @@ class M3u8Player implements PlayerInterface {
       final name = js_util.getProperty(attrs, 'NAME');
       if (name != null) return name;
     } catch (_) {}
-    return '${height}p (${(bitrate / 1000).round()}kbps)';
+    return '${height}p';
   }
 
   void _setupLevelSwitchCallback(List<Map<String, dynamic>> qualityList) {
