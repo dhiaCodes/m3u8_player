@@ -42,9 +42,10 @@ class M3u8Player implements PlayerInterface {
     Function()? onCompleted,
     double completedPercentage = 1.0,
   }) {
+    print("DEBUG: M3u8Player constructor chamado");
     _onCompleted = onCompleted;
     _completedPercentage = completedPercentage;
-
+ 
     _videoElement = html.VideoElement()
       ..style.width = '100%'
       ..style.height = '100%'
