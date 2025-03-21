@@ -77,7 +77,8 @@ class M3u8Player implements PlayerInterface {
 
   @override
   Future<void> initialize(String url) async {
-    html.window.console.log("DEBUG: initialize called with url: " + url);
+    print("DEBUG: initialize() chamado com url: " + url);
+    html.window.console.log("DEBUG: initialize chamado com url: " + url);
     if (!js_util.hasProperty(window, 'Hls')) {
       html.window.console.error("DEBUG: window.Hls not found");
       return;
