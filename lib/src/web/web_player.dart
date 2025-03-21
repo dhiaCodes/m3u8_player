@@ -78,26 +78,20 @@ class M3u8Player implements PlayerInterface {
 
   @override
   Future<void> initialize(String url) async {
-    print("DEBUG: initialize() chamado com url: " + url);
-    html.window.console.log("DEBUG: initialize chamado com url: " + url);
     if (!js_util.hasProperty(window, 'Hls')) {
-      html.window.console.log("DEBUG: window.Hls not found, attempting dynamic load.");
       final completer = Completer<void>();
       final script = html.ScriptElement()
         ..src = "https://cdn.jsdelivr.net/npm/hls.js@latest"
         ..type = "text/javascript";
       script.onLoad.listen((_) {
-         html.window.console.log("DEBUG: hls.js loaded successfully.");
          completer.complete();
       });
       script.onError.listen((_) {
-         html.window.console.error("DEBUG: Error loading hls.js");
          completer.completeError("Error loading hls.js");
       });
       html.document.head?.append(script);
       try {
          await completer.future;
-         html.window.console.log("DEBUG: hls.js dynamic load complete");
       } catch(e) {
          html.window.console.error("DEBUG: hls.js dynamic load failed: $e");
          return;
@@ -110,7 +104,6 @@ class M3u8Player implements PlayerInterface {
       [],
     );
     if (!isSupported) {
-      html.window.console.error("DEBUG: Hls is not supported in this browser");
       return;
     }
 
