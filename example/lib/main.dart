@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
           constraints: const BoxConstraints(maxWidth: 800),
           child: M3u8PlayerWidget(
             config: PlayerConfig(
-              url: 'https://video.apptrix.app/hls/teste_novo/index.m3u8',
+              url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
               autoPlay: true,
               startPosition: 15,
               enableProgressCallback: true,

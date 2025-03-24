@@ -1,12 +1,16 @@
 # Changelog
 
+## [v0.0.6] - 2025-03-21
+
+- Fixed some bugs
+
 ## [v0.0.5] - 2025-03-21
 
-    - Removed bitrate shows from web player
+- Removed bitrate shows from web player
 
 ## [v0.0.4] - 2025-03-21
 
-    - Fixed web player.
+- Fixed web player.
 
 ## [v0.0.3] - 2025-03-21
 

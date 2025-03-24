@@ -39,6 +39,8 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget> with WidgetsBinding
   double _playbackSpeed = 1.0;
   Timer? _progressTimer;
 
+  
+
   @override
   void initState() {
     super.initState();
