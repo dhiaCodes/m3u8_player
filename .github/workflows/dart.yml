@@ -21,7 +21,7 @@ jobs:
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.0.0'  # Specify a specific version
+          sdk: '3.6.0'  # Specify a specific version
 
       - name: Install dependencies
         run: flutter pub get
