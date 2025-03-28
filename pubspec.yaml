@@ -1,6 +1,6 @@
 name: m3u8_player
 description: A Flutter package that provides a customizable M3U8 player for both mobile and web platforms.
-version: 0.0.6
+version: 0.0.7
 homepage: https://github.com/MendesCorporation/m3u8_player
 
 environment:
