@@ -29,25 +29,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool _isPlayerFullScreen = false;
-
-  void _onFullScreenChanged(bool isFullscreen) {
-    setState(() {
-      _isPlayerFullScreen = isFullscreen;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _isPlayerFullScreen ? null : AppBar(title: const Text('M3U8 Player Demo')),
+      appBar: AppBar(title: const Text('M3U8 Player Demo')),
       backgroundColor: const Color.fromARGB(221, 255, 255, 255),
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 800),
           child: M3u8PlayerWidget(
             config: PlayerConfig(
-              url: 'https://video.apptrix.app/hls/teste_novo/index.m3u8',
+              url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+              //url: 'https://video.apptrix.app/hls/teste_novo/index.m3u8',
               autoPlay: true,
               startPosition: 15,
               enableProgressCallback: true,
@@ -57,9 +51,11 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               completedPercentage: 0.95,
               onCompleted:(){
-                print('Video completo');
+                print('Video Done');
               },
-              onFullscreenChanged: _onFullScreenChanged,
+              onFullscreenChanged: (isFullscreen) { 
+                print("Fullscreen changed: $isFullscreen"); 
+              },
               theme: const PlayerTheme(
                 primaryColor: Colors.white,
                 progressColor: Colors.red,

@@ -1,8 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import '../player_interface.dart';
 import 'dart:async';
 import '../services/m3u8_quality_service.dart';
+import '../models/player_theme.dart';
+import 'fullscreen_video_page.dart';
 
 class M3u8Player implements PlayerInterface {
   VideoPlayerController? _controller;
@@ -17,6 +20,10 @@ class M3u8Player implements PlayerInterface {
   Function()? _onCompleted;
   String _originalUrl = "";
   List<VideoQuality>? _qualities;
+  BuildContext? _context;
+  bool _isPlaying = false;
+  String? _currentQuality;
+
 
   M3u8Player({
     required this.onQualitiesUpdated,
@@ -27,7 +34,8 @@ class M3u8Player implements PlayerInterface {
     this.onFullscreenChanged,
     Function()? onCompleted,
     double completedPercentage = 1.0,
-  }) {
+    BuildContext? context,
+  }) : _context = context {
     _onCompleted = onCompleted;
     _completedPercentage = completedPercentage;
 
@@ -52,9 +60,12 @@ class M3u8Player implements PlayerInterface {
       }
     });
 
-    // Inicializa qualidades padrão
     onQualitiesUpdated([]);
     onQualityChanged('Auto');
+  }
+
+  void updateContext(BuildContext context) {
+    _context = context;
   }
 
   @override
@@ -98,7 +109,6 @@ class M3u8Player implements PlayerInterface {
 
     M3u8QualityService().fetchQualities(url).then((qualities) {
       _qualities = qualities;
-      // Ordena qualidades em ordem decrescente considerando o valor numérico em qualityName
       _qualities!.sort((a, b) {
         int aVal = int.tryParse(a.qualityName) ?? 0;
         int bVal = int.tryParse(b.qualityName) ?? 0;
@@ -116,12 +126,14 @@ class M3u8Player implements PlayerInterface {
   void play() {
     _controller?.play();
     WakelockPlus.enable();
+    _isPlaying = true;
   }
 
   @override
   void pause() {
     _controller?.pause();
     WakelockPlus.disable();
+    _isPlaying = false;
   }
 
   @override
@@ -204,19 +216,18 @@ class M3u8Player implements PlayerInterface {
     await _controller?.seekTo(currentPosition);
     _controller?.play();
     onQualityChanged(selected.qualityName);
+    _currentQuality = selected.qualityName;
   }
 
   @override
   void enterFullscreen() {
-    // Implement fullscreen behavior for mobile if needed.
     if (onFullscreenChanged != null) {
       onFullscreenChanged!(true);
     }
-  }
+  }  
 
   @override
   void exitFullscreen() {
-    // Implement exit fullscreen behavior.
     if (onFullscreenChanged != null) {
       onFullscreenChanged!(false);
     }

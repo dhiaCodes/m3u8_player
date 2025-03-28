@@ -8,6 +8,8 @@ A Flutter package that provides a customizable M3U8 player for both mobile and w
 
 
 
+[![Support Me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/heliomendes)
+
 
 ## Features
 
@@ -172,6 +174,13 @@ M3u8PlayerWidget({
 ```
 
 - **config**: `PlayerConfig` - Configuration for initializing the player.
+
+## Donate
+
+If you liked this project, consider supporting it with a donation!
+
+[![Support Me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/heliomendes)
+
 
 ## Contributing
 
