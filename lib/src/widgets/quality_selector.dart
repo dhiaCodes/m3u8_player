@@ -7,11 +7,11 @@ class QualitySelector extends StatelessWidget {
   final VideoQuality? selectedQuality;
 
   const QualitySelector({
-    Key? key,
+    super.key,
     required this.qualities,
     required this.onQualitySelected,
     this.selectedQuality,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

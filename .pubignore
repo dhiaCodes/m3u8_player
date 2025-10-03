@@ -1,0 +1,37 @@
+# Exclude build directories
+build/
+.dart_tool/
+
+# Exclude IDE files
+.vscode/
+.idea/
+*.iml
+
+# Exclude OS files
+.DS_Store
+Thumbs.db
+
+# Exclude example build artifacts
+example/build/
+example/.dart_tool/
+example/ios/Pods/
+example/ios/.symlinks/
+example/android/.gradle/
+example/android/app/build/
+
+# Exclude large media files if any
+*.mov
+*.mp4
+*.avi
+*.mkv
+
+# Keep these files for the package
+!README.md
+!CHANGELOG.md
+!LICENSE
+!pubspec.yaml
+!lib/
+!android/
+!ios/
+!web/
+!example/

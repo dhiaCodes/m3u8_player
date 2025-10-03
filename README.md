@@ -1,4 +1,22 @@
-# M3U8 Player
+# M3U8 Player Plus
+
+An enhanced Flutter package that provides a customizable M3U8 player for both mobile and web platforms with improved mobile support and modern web APIs.
+
+## 🚀 What's New in Plus Version
+
+This package is a fork of the original [m3u8_player](https://github.com/MendesCorporation/m3u8_player) with significant improvements:
+
+### ✨ Key Improvements
+- **Full Mobile Platform Support**: Added complete support for Android and iOS platforms
+- **Modern Web APIs**: Replaced deprecated `dart:html` and `dart:js_util` with modern `dart:js_interop`, `dart:js_interop_unsafe`, and `package:web`
+- **Bug Fixes**: Fixed multiple web-related issues for better stability and performance
+- **Enhanced Compatibility**: Improved compatibility with latest Flutter and Dart versions
+
+### 🙏 Attribution
+
+This package is a fork of the original [m3u8_player](https://github.com/MendesCorporation/m3u8_player) created by [Helio Mendes](https://github.com/MendesCorporation). We extend our sincere gratitude to the original author for creating the foundation that made this enhanced version possible.
+
+## 📱 Features
 
 A Flutter package that provides a customizable M3U8 player for both mobile and web platforms.
 
@@ -28,9 +46,7 @@ Add `m3u8_player` to your project's `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  m3u8_player:
-    git:
-      url: https://github.com/MendesCorporation/m3u8_player.git
+  m3u8_player_plus: ^1.0.0
 ```
 
 Then run:
@@ -44,7 +60,7 @@ flutter pub get
 #### Import the Package
 
 ```dart
-import 'package:m3u8_player/m3u8_player.dart';
+import 'package:m3u8_player_plus/m3u8_player_plus.dart';
 ```
 
 #### Initialize PlayerConfig
@@ -85,7 +101,7 @@ PlayerConfig config = PlayerConfig(
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:m3u8_player/m3u8_player.dart';
+import 'package:m3u8_player_plus/m3u8_player_plus.dart';
 
 void main() {
   runApp(const MyApp());

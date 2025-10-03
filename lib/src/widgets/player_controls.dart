@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/player_theme.dart';
 
-
 /// Widget principal de controles do player.
 class PlayerControls extends StatefulWidget {
   final bool isPlaying;
@@ -49,6 +48,7 @@ class PlayerControls extends StatefulWidget {
 
 class _PlayerControlsState extends State<PlayerControls> {
   bool _showControls = true;
+
   bool _isDragging = false;
   Timer? _hideTimer;
 
@@ -108,7 +108,7 @@ class _PlayerControlsState extends State<PlayerControls> {
       tooltip: 'Velocidade de reprodução',
       onSelected: widget.onSpeedChanged,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      color: widget.theme.backgroundColor.withOpacity(0.95),
+      color: widget.theme.backgroundColor.withValues(alpha: 0.95),
       offset: const Offset(0, -10),
       itemBuilder: (context) => _speedOptions.map((speed) {
         final isSelected = speed == widget.playbackSpeed;
@@ -123,7 +123,7 @@ class _PlayerControlsState extends State<PlayerControls> {
                 style: TextStyle(
                   color: isSelected
                       ? widget.theme.primaryColor
-                      : widget.theme.primaryColor.withOpacity(0.7),
+                      : widget.theme.primaryColor.withValues(alpha: 0.7),
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   fontSize: 14,
                 ),
@@ -141,7 +141,7 @@ class _PlayerControlsState extends State<PlayerControls> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: widget.theme.backgroundColor.withOpacity(0.3),
+          color: widget.theme.backgroundColor.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Row(
@@ -172,7 +172,7 @@ class _PlayerControlsState extends State<PlayerControls> {
     return PopupMenuButton<String>(
       tooltip: 'Qualidade',
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      color: widget.theme.backgroundColor.withOpacity(0.95),
+      color: widget.theme.backgroundColor.withValues(alpha: 0.95),
       offset: const Offset(0, -10),
       onSelected: widget.onQualityChanged,
       itemBuilder: (context) => widget.qualities.map((quality) {
@@ -188,7 +188,7 @@ class _PlayerControlsState extends State<PlayerControls> {
                 style: TextStyle(
                   color: isSelected
                       ? widget.theme.primaryColor
-                      : widget.theme.primaryColor.withOpacity(0.7),
+                      : widget.theme.primaryColor.withValues(alpha: .7),
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   fontSize: 14,
                 ),
@@ -203,28 +203,40 @@ class _PlayerControlsState extends State<PlayerControls> {
           ),
         );
       }).toList(),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: widget.theme.backgroundColor.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(4),
+      child: Badge(
+        isLabelVisible:
+            widget.currentQuality == '720p' || widget.currentQuality == '1080p'
+                ? true
+                : false,
+        label: const Text('HD'),
+        padding: EdgeInsets.zero,
+        textStyle: const TextStyle(
+          fontSize: 8,
+          fontWeight: FontWeight.bold,
         ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.settings,
-              color: widget.theme.primaryColor,
-              size: 16,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              widget.currentQuality ?? 'Auto',
-              style: TextStyle(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: widget.theme.backgroundColor.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.settings,
                 color: widget.theme.primaryColor,
-                fontSize: 14,
+                size: 16,
               ),
-            ),
-          ],
+              const SizedBox(width: 4),
+              Text(
+                widget.currentQuality ?? 'Auto',
+                style: TextStyle(
+                  color: widget.theme.primaryColor,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -268,7 +280,7 @@ class _PlayerControlsState extends State<PlayerControls> {
                 activeTrackColor: widget.theme.progressColor,
                 inactiveTrackColor: Colors.transparent,
                 thumbColor: widget.theme.primaryColor,
-                overlayColor: widget.theme.primaryColor.withOpacity(0.3),
+                overlayColor: widget.theme.primaryColor.withValues(alpha: 0.3),
                 thumbShape: const RoundSliderThumbShape(
                   enabledThumbRadius: 8,
                   elevation: 2,
@@ -372,7 +384,8 @@ class _PlayerControlsState extends State<PlayerControls> {
                   activeTrackColor: widget.theme.primaryColor,
                   inactiveTrackColor: widget.theme.bufferColor,
                   thumbColor: widget.theme.primaryColor,
-                  overlayColor: widget.theme.primaryColor.withOpacity(0.3),
+                  overlayColor:
+                      widget.theme.primaryColor.withValues(alpha: 0.3),
                   trackHeight: 4.0,
                 ),
                 child: Slider(
@@ -390,7 +403,7 @@ class _PlayerControlsState extends State<PlayerControls> {
 
         // Botão de velocidade
         _buildSpeedButton(),
-
+        const SizedBox(width: 8),
         // Botão de qualidade (se houver)
         if (widget.qualities.isNotEmpty) _buildQualityButton(),
 
@@ -421,7 +434,7 @@ class _PlayerControlsState extends State<PlayerControls> {
           _startHideTimer();
         },
         child: AnimatedOpacity(
-          opacity: _showControls ? 1.0 : 0.0,
+          opacity: (_showControls || !widget.isPlaying) ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 300),
           child: Container(
             decoration: BoxDecoration(
@@ -429,8 +442,8 @@ class _PlayerControlsState extends State<PlayerControls> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withOpacity(0.0),
-                  Colors.black.withOpacity(0.7),
+                  Colors.black.withValues(alpha: 0.0),
+                  Colors.black.withValues(alpha: 0.7),
                 ],
               ),
             ),

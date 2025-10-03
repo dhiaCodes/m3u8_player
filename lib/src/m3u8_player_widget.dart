@@ -1,5 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'android_web_package_fallback.dart'
+    if (dart.library.html) 'package:web/web.dart' as web;
+
 import 'package:video_player/video_player.dart';
 import 'package:flutter/services.dart';
 import 'mobile/fullscreen_video_page.dart';
@@ -9,7 +14,6 @@ import 'dart:async';
 import 'player_interface.dart';
 import 'player_factory.dart';
 import 'player_impl.dart';
-import 'mobile/fullscreen_video_page.dart';
 //import 'mobile/mobile_player.dart';
 //import 'web/web_player.dart' if (dart.library.io) 'stubs/web_stub.dart';
 
@@ -19,9 +23,9 @@ class M3u8PlayerWidget extends StatefulWidget {
   final PlayerConfig config;
 
   const M3u8PlayerWidget({
-    Key? key,
+    super.key,
     required this.config,
-  }) : super(key: key);
+  });
 
   @override
   State<M3u8PlayerWidget> createState() => _M3u8PlayerWidgetState();
@@ -32,7 +36,7 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
   late PlayerInterface _player;
   bool _isPlaying = false;
   bool _isFullScreen = false;
-  bool _ignoreOrientation = false; // New flag for ignoring orientation changes
+// New flag for ignoring orientation changes
   List<String> _qualities = [];
   String? _currentQuality;
   bool _isInitialized = false;
@@ -42,7 +46,6 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
   double _volume = 1.0;
   double _playbackSpeed = 1.0;
   Timer? _progressTimer;
-  Orientation? _lastOrientation;
 
   @override
   void initState() {
@@ -69,24 +72,24 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
     }
   }
 
-  @override
-  void didChangeMetrics() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_ignoreOrientation) {
-        return;
-      }
-      final Orientation currentOrientation = MediaQuery.of(context).orientation;
-      if (!_isFullScreen && currentOrientation == Orientation.landscape) {
-        Future.delayed(const Duration(seconds: 1), () {
-          if (!_isFullScreen &&
-              !_ignoreOrientation &&
-              MediaQuery.of(context).orientation == Orientation.landscape) {
-            _toggleFullScreen();
-          }
-        });
-      }
-    });
-  }
+  // @override
+  // void didChangeMetrics() {
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     if (_ignoreOrientation) {
+  //       return;
+  //     }
+  //     final Orientation currentOrientation = MediaQuery.of(context).orientation;
+  //     if (!_isFullScreen && currentOrientation == Orientation.landscape) {
+  //       Future.delayed(const Duration(seconds: 1), () {
+  //         if (!_isFullScreen &&
+  //             !_ignoreOrientation &&
+  //             MediaQuery.of(context).orientation == Orientation.landscape) {
+  //           _toggleFullScreen();
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
 
   void _setupProgressCallback() {
     _progressTimer?.cancel();
@@ -102,6 +105,7 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
   }
 
   Future<void> _initializePlayer() async {
+    log("DEBUG: Initializing player for URL: ${widget.config.url}");
     _player = createPlayer(
       onQualitiesUpdated: (qualities) {
         setState(() => _qualities = qualities);
@@ -118,13 +122,13 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
       onBufferedChanged: (buffered) {
         setState(() => _buffered = buffered);
       },
-      onFullscreenChanged: (isFullscreen) {
-        setState(() => _isFullScreen = isFullscreen);
-        if (widget.config.onFullscreenChanged != null) {
-          widget.config.onFullscreenChanged!(isFullscreen);
+      onCompleted: () {
+        setState(() => _isPlaying = false);
+        log("DEBUG: Video completed callback triggered.");
+        if (widget.config.onCompleted != null) {
+          widget.config.onCompleted!();
         }
       },
-      onCompleted: widget.config.onCompleted,
       completedPercentage: widget.config.completedPercentage,
     );
 
@@ -150,8 +154,11 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
   }
 
   void _toggleFullScreen() {
+    log("DEBUG: Toggling fullscreen..");
     if (kIsWeb) {
       final webPlayer = _player as M3u8Player;
+      setState(() => _isFullScreen = web.document.fullscreen);
+      log("DEBUG: Toggling fullscreen. Current state: $_isFullScreen");
       if (!_isFullScreen) {
         webPlayer.enterFullscreen();
       } else {
@@ -178,9 +185,6 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
                 if (mounted) {
                   setState(() {
                     _isFullScreen = false;
-                    _ignoreOrientation = true;
-                    _lastOrientation =
-                        null; // Reinicia a verificação de mudança de orientação
                   });
                   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
                   SystemChrome.setPreferredOrientations(
@@ -190,9 +194,7 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
                   }
                   Future.delayed(const Duration(seconds: 2), () {
                     if (mounted) {
-                      setState(() {
-                        _ignoreOrientation = false;
-                      });
+                      setState(() {});
                       SystemChrome.setPreferredOrientations([
                         DeviceOrientation.portraitUp,
                         DeviceOrientation.landscapeLeft,
@@ -258,7 +260,7 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
         if (!_isPlaying)
           IgnorePointer(
             child: Container(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               child: const Center(
                 child: Icon(
                   Icons.play_arrow,
@@ -321,7 +323,7 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
         if (!_isPlaying)
           IgnorePointer(
             child: Container(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               child: const Center(
                 child: Icon(
                   Icons.play_arrow,

@@ -1,10 +1,10 @@
-name: m3u8_player
-description: A Flutter package that provides a customizable M3U8 player for both mobile and web platforms.
-version: 0.0.7
-homepage: https://github.com/MendesCorporation/m3u8_player
+name: m3u8_player_plus
+description: An enhanced Flutter package that provides a customizable M3U8 player for mobile and web platforms with improved mobile support and modern web APIs.
+version: 1.0.0
+homepage: https://github.com/dhiaCodes/m3u8_player
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.3.0 <4.0.0'
   flutter: ">=3.0.0"
 
 dependencies:
@@ -12,14 +12,10 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
+  http: ^1.5.0
   video_player: ^2.8.1
-  video_player_web: ^2.1.2
-  js: ^0.6.7
-  flutter_hls_parser: ^2.0.1
-  provider: ^6.1.1
-  screen_brightness_platform_interface: ^2.0.0
   wakelock_plus: ^1.2.10
-  http: ^0.13.5
+  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:

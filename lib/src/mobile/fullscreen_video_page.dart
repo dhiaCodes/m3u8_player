@@ -66,7 +66,6 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> {
       });
     });
 
-
     _initializeFuture = _controller.value.isInitialized
         ? Future.value()
         : _controller.initialize();
@@ -110,11 +109,8 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> {
       return Container();
     }
 
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.of(context).pop();
-        return false;
-      },
+    return PopScope(
+      canPop: false,
       child: Scaffold(
         backgroundColor: Colors.black,
         body: SafeArea(
@@ -197,10 +193,8 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> {
                     setState(() {
                       _isBeingReplaced = true;
                     });
-                    // Inicializa o novo controller se necessário
-                    Future<void> newInitFuture = newController.value.isInitialized
-                        ? Future.value()
-                        : newController.initialize();
+
+                    if (!context.mounted) return;
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
                         builder: (context) => FullscreenVideoPage(

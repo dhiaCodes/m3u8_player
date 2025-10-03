@@ -1,23 +1,35 @@
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
-import 'dart:js_util' as js_util;
+import 'dart:developer';
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
+import 'package:web/web.dart' as web;
 import 'dart:async';
-import 'package:js/js.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import '../player_interface.dart';
-// Importação condicional para registrar a view (dart:ui_web está disponível na web)
-import 'dart:ui' as ui;
+import 'dart:ui_web' as ui;
 
 @JS('window')
-external dynamic get window;
+external JSObject get window;
+
+@JS('Hls')
+extension type HlsJS._(JSObject _) implements JSObject {
+  external HlsJS(JSObject config);
+  external static bool isSupported();
+  external void loadSource(String url);
+  external void attachMedia(web.HTMLVideoElement video);
+  external void on(String event, JSFunction callback);
+  external void destroy();
+  external int get currentLevel;
+  external set currentLevel(int level);
+  external JSObject get levels;
+}
 
 class M3u8Player implements PlayerInterface {
   static void registerWith(Registrar registrar) {
     // Se necessário, registre o plugin web.
   }
 
-  html.VideoElement? _videoElement;
-  dynamic _hls;
+  web.HTMLVideoElement? _videoElement;
+  JSObject? _hls;
   Timer? _progressTimer;
   final String _viewId = 'hls-video-${DateTime.now().millisecondsSinceEpoch}';
   final Function(List<String>) onQualitiesUpdated;
@@ -25,9 +37,9 @@ class M3u8Player implements PlayerInterface {
   final Function(Duration) onDurationChanged;
   final Function(Duration) onPositionChanged;
   final Function(Duration) onBufferedChanged;
-  final Function(bool)? onFullscreenChanged;
   bool _isInitialized = false;
   bool _hasCompleted = false;
+  bool get hasCompleted => _hasCompleted;
   double _completedPercentage = 1.0; // Default to 100%
   Function()? _onCompleted;
 
@@ -38,14 +50,13 @@ class M3u8Player implements PlayerInterface {
     required this.onDurationChanged,
     required this.onPositionChanged,
     required this.onBufferedChanged,
-    this.onFullscreenChanged,
     Function()? onCompleted,
     double completedPercentage = 1.0,
   }) {
     _onCompleted = onCompleted;
     _completedPercentage = completedPercentage;
- 
-    _videoElement = html.VideoElement()
+
+    _videoElement = web.HTMLVideoElement()
       ..style.width = '100%'
       ..style.height = '100%'
       ..style.border = 'none'
@@ -55,11 +66,6 @@ class M3u8Player implements PlayerInterface {
       ..style.objectFit = 'contain'
       ..controls = false
       ..muted = true;
-
-    html.document.onFullscreenChange.listen((_) {
-      final isFullscreen = html.document.fullscreenElement != null;
-      onFullscreenChanged?.call(isFullscreen);
-    });
 
     // Registra a view para HtmlElementView
     // ignore: undefined_prefixed_name
@@ -77,65 +83,63 @@ class M3u8Player implements PlayerInterface {
 
   @override
   Future<void> initialize(String url) async {
-    if (!js_util.hasProperty(window, 'Hls')) {
+    if (!window.has('Hls')) {
       final completer = Completer<void>();
-      final script = html.ScriptElement()
+      final script = web.HTMLScriptElement()
         ..src = "https://cdn.jsdelivr.net/npm/hls.js@latest"
         ..type = "text/javascript";
       script.onLoad.listen((_) {
-         completer.complete();
+        completer.complete();
       });
       script.onError.listen((_) {
-         completer.completeError("Error loading hls.js");
+        completer.completeError("Error loading hls.js");
       });
-      html.document.head?.append(script);
+      web.document.head?.append(script);
       try {
-         await completer.future;
-      } catch(e) {
-         html.window.console.error("DEBUG: hls.js dynamic load failed: $e");
-         return;
+        await completer.future;
+      } catch (e) {
+        log("DEBUG: Error loading hls.js: $e");
+        return;
       }
     }
-    
-    final isSupported = js_util.callMethod(
-      js_util.getProperty(window, 'Hls'),
-      'isSupported',
-      [],
-    );
-    if (!isSupported) {
+
+    final hlsConstructor = window.getProperty('Hls'.toJS) as JSFunction;
+    final isSupported = hlsConstructor.callMethod('isSupported'.toJS);
+    if (!(isSupported as JSBoolean).toDart) {
       return;
     }
 
-    final hlsConfig = js_util.jsify({
+    final hlsConfig = {
       'debug': false,
       'enableWorker': true,
       'lowLatencyMode': true,
       'autoStartLoad': true,
-    });
+    }.jsify();
 
     try {
-      _hls = js_util.callConstructor(
-        js_util.getProperty(window, 'Hls'),
-        [hlsConfig],
-      );
+      _hls = hlsConstructor.callAsConstructor(hlsConfig);
     } catch (e) {
       return;
     }
 
-    final manifestLoadedCallback = js_util.allowInterop((dynamic event, dynamic data) {
+    final manifestLoadedCallback = ((JSAny event, JSAny data) {
       try {
-        final levels = js_util.getProperty(data, 'levels');
+        final dataObj = data as JSObject;
+        final levels = dataObj.getProperty('levels'.toJS);
         if (levels == null) return;
 
-        final levelsLength = js_util.getProperty(levels, 'length') as int;
+        final levelsArray = levels as JSObject;
+        final levelsLength =
+            (levelsArray.getProperty('length'.toJS) as JSNumber).toDartInt;
         List<String> qualities = ['Auto'];
         List<Map<String, dynamic>> qualityList = [];
 
         for (var i = 0; i < levelsLength; i++) {
           try {
-            final level = js_util.getProperty(levels, '$i');
+            final level = levelsArray.getProperty('$i'.toJS) as JSObject;
             final quality = _getQualityString(level);
-            final height = js_util.getProperty(level, 'height');
+            final height =
+                (level.getProperty('height'.toJS) as JSNumber).toDartInt;
             qualityList.add({
               'quality': quality,
               'height': height,
@@ -145,57 +149,62 @@ class M3u8Player implements PlayerInterface {
             continue;
           }
         }
-        qualityList.sort((a, b) => (b['height'] as int).compareTo(a['height'] as int));
+        qualityList
+            .sort((a, b) => (b['height'] as int).compareTo(a['height'] as int));
         qualities.addAll(qualityList.map((q) => q['quality'] as String));
 
         if (qualities.isNotEmpty) {
           onQualitiesUpdated(qualities);
-          js_util.setProperty(_hls, 'currentLevel', -1);
+          _hls!.setProperty('currentLevel'.toJS, (-1).toJS);
           onQualityChanged('Auto');
           _setupLevelSwitchCallback(qualityList);
         }
       } catch (_) {}
-    });
+    }).toJS;
 
-    final manifestParsedCallback = js_util.allowInterop((dynamic event, dynamic data) {
+    final manifestParsedCallback = ((JSAny event, JSAny data) {
       if (_videoElement != null) {
         _videoElement!.volume = 1.0;
         _videoElement!.muted = false;
       }
-    });
+    }).toJS;
 
-    js_util.callMethod(_hls, 'on', ['hlsManifestLoaded', manifestLoadedCallback]);
-    js_util.callMethod(_hls, 'on', ['hlsManifestParsed', manifestParsedCallback]);
+    _hls!.callMethod(
+        'on'.toJS, 'hlsManifestLoaded'.toJS, manifestLoadedCallback);
+    _hls!.callMethod(
+        'on'.toJS, 'hlsManifestParsed'.toJS, manifestParsedCallback);
 
-    js_util.callMethod(_hls, 'loadSource', [url]);
-    js_util.callMethod(_hls, 'attachMedia', [_videoElement]);
+    _hls!.callMethod('loadSource'.toJS, url.toJS);
+    _hls!.callMethod('attachMedia'.toJS, _videoElement!);
 
     _setupVideoEventListeners();
     _startProgressTimer();
     _isInitialized = true;
   }
 
-  String _getQualityString(dynamic level) {
-    final height = js_util.getProperty(level, 'height');
-    final bitrate = js_util.getProperty(level, 'bitrate');
-    final attrs = js_util.getProperty(level, 'attrs');
+  String _getQualityString(JSObject level) {
+    final height = level.getProperty('height'.toJS) as JSNumber?;
+    final attrs = level.getProperty('attrs'.toJS) as JSObject?;
     try {
-      final name = js_util.getProperty(attrs, 'NAME');
-      if (name != null) return name;
+      if (attrs != null) {
+        final name = attrs.getProperty('NAME'.toJS) as JSString?;
+        if (name != null) return name.toDart;
+      }
     } catch (_) {}
-    return '${height}p';
+    return '${height?.toDartInt ?? 0}p';
   }
 
   void _setupLevelSwitchCallback(List<Map<String, dynamic>> qualityList) {
-    final levelSwitchCallback = js_util.allowInterop((dynamic event, dynamic data) {
-      final currentLevel = js_util.getProperty(_hls, 'currentLevel');
+    final levelSwitchCallback = ((JSAny event, JSAny data) {
+      final currentLevel =
+          (_hls!.getProperty('currentLevel'.toJS) as JSNumber).toDartInt;
       if (currentLevel == -1) {
         onQualityChanged('Auto');
       } else if (currentLevel >= 0 && currentLevel < qualityList.length) {
         onQualityChanged(qualityList[currentLevel]['quality'] as String);
       }
-    });
-    js_util.callMethod(_hls, 'on', ['levelSwitched', levelSwitchCallback]);
+    }).toJS;
+    _hls!.callMethod('on'.toJS, 'levelSwitched'.toJS, levelSwitchCallback);
   }
 
   void _setupVideoEventListeners() {
@@ -208,16 +217,16 @@ class M3u8Player implements PlayerInterface {
       final position = _videoElement?.currentTime ?? 0;
       onPositionChanged(Duration(milliseconds: (position * 1000).toInt()));
       if ((_videoElement?.buffered.length ?? 0) > 0) {
-        final buffered = _videoElement!.buffered.end(_videoElement!.buffered.length - 1);
+        final buffered =
+            _videoElement!.buffered.end(_videoElement!.buffered.length - 1);
         onBufferedChanged(Duration(milliseconds: (buffered * 1000).toInt()));
       }
       // Verifica se a porcentagem de conclusão foi atingida e chama onCompleted.
-      if (!_hasCompleted &&
-          _videoElement != null &&
-          _videoElement!.duration > 0) {
+      if (_videoElement != null && _videoElement!.duration > 0) {
         double progress = _videoElement!.currentTime / _videoElement!.duration;
         if (progress >= _completedPercentage) {
           _hasCompleted = true;
+
           _onCompleted?.call();
         }
       }
@@ -276,17 +285,18 @@ class M3u8Player implements PlayerInterface {
     if (!_isInitialized || _hls == null) return;
 
     if (quality == 'Auto') {
-      js_util.setProperty(_hls, 'currentLevel', -1);
+      _hls!.setProperty('currentLevel'.toJS, (-1).toJS);
       onQualityChanged('Auto');
       return;
     }
 
-    final levels = js_util.getProperty(_hls, 'levels');
-    final levelsLength = js_util.getProperty(levels, 'length') as int;
+    final levels = _hls!.getProperty('levels'.toJS) as JSObject;
+    final levelsLength =
+        (levels.getProperty('length'.toJS) as JSNumber).toDartInt;
     for (var i = 0; i < levelsLength; i++) {
-      final level = js_util.getProperty(levels, '$i');
+      final level = levels.getProperty('$i'.toJS) as JSObject;
       if (_getQualityString(level) == quality) {
-        js_util.setProperty(_hls, 'currentLevel', i);
+        _hls!.setProperty('currentLevel'.toJS, i.toJS);
         onQualityChanged(quality);
         break;
       }
@@ -297,30 +307,34 @@ class M3u8Player implements PlayerInterface {
   void enterFullscreen() {
     try {
       if (_videoElement != null) {
-        if (js_util.hasProperty(_videoElement!, 'requestFullscreen')) {
-          js_util.callMethod(_videoElement!, 'requestFullscreen', []);
-        } else if (js_util.hasProperty(_videoElement!, 'webkitRequestFullscreen')) {
-          js_util.callMethod(_videoElement!, 'webkitRequestFullscreen', []);
-        } else if (js_util.hasProperty(_videoElement!, 'mozRequestFullScreen')) {
-          js_util.callMethod(_videoElement!, 'mozRequestFullScreen', []);
-        } else if (js_util.hasProperty(_videoElement!, 'msRequestFullscreen')) {
-          js_util.callMethod(_videoElement!, 'msRequestFullscreen', []);
+        final videoObj = _videoElement! as JSObject;
+        if (videoObj.has('requestFullscreen')) {
+          videoObj.callMethod('requestFullscreen'.toJS);
+        } else if (videoObj.has('webkitRequestFullscreen')) {
+          videoObj.callMethod('webkitRequestFullscreen'.toJS);
+        } else if (videoObj.has('mozRequestFullScreen')) {
+          videoObj.callMethod('mozRequestFullScreen'.toJS);
+        } else if (videoObj.has('msRequestFullscreen')) {
+          videoObj.callMethod('msRequestFullscreen'.toJS);
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      log("DEBUG: enterFullscreen error: $e");
+    }
   }
 
   @override
   void exitFullscreen() {
     try {
-      if (js_util.hasProperty(html.document, 'exitFullscreen')) {
-        js_util.callMethod(html.document, 'exitFullscreen', []);
-      } else if (js_util.hasProperty(html.document, 'webkitExitFullscreen')) {
-        js_util.callMethod(html.document, 'webkitExitFullscreen', []);
-      } else if (js_util.hasProperty(html.document, 'mozCancelFullScreen')) {
-        js_util.callMethod(html.document, 'mozCancelFullScreen', []);
-      } else if (js_util.hasProperty(html.document, 'msExitFullscreen')) {
-        js_util.callMethod(html.document, 'msExitFullscreen', []);
+      final documentObj = web.document as JSObject;
+      if (documentObj.has('exitFullscreen')) {
+        documentObj.callMethod('exitFullscreen'.toJS);
+      } else if (documentObj.has('webkitExitFullscreen')) {
+        documentObj.callMethod('webkitExitFullscreen'.toJS);
+      } else if (documentObj.has('mozCancelFullScreen')) {
+        documentObj.callMethod('mozCancelFullScreen'.toJS);
+      } else if (documentObj.has('msExitFullscreen')) {
+        documentObj.callMethod('msExitFullscreen'.toJS);
       }
     } catch (_) {}
   }
@@ -331,7 +345,7 @@ class M3u8Player implements PlayerInterface {
     if (_isInitialized) {
       _videoElement?.pause();
       if (_hls != null) {
-        js_util.callMethod(_hls, 'destroy', []);
+        _hls!.callMethod('destroy'.toJS);
       }
       _videoElement?.remove();
     }

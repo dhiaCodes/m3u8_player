@@ -1,5 +1,3 @@
-import 'package:flutter/widgets.dart';
-
 import 'player_interface.dart';
 import 'player_impl.dart';
 
@@ -9,7 +7,6 @@ PlayerInterface createPlayer({
   required Function(Duration) onDurationChanged,
   required Function(Duration) onPositionChanged,
   required Function(Duration) onBufferedChanged,
-  Function(bool)? onFullscreenChanged,
   Function()? onCompleted,
   double completedPercentage = 1.0,
 }) {
@@ -19,7 +16,6 @@ PlayerInterface createPlayer({
     onDurationChanged: onDurationChanged,
     onPositionChanged: onPositionChanged,
     onBufferedChanged: onBufferedChanged,
-    onFullscreenChanged: onFullscreenChanged,
     onCompleted: onCompleted,
     completedPercentage: completedPercentage,
   );

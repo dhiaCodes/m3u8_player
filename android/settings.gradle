@@ -1,2 +1,1 @@
-include ':m3u8_player'
 rootProject.name = 'm3u8_player'

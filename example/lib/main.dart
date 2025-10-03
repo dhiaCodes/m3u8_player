@@ -1,5 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:m3u8_player/m3u8_player.dart';
+import 'package:m3u8_player_plus/m3u8_player_plus.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,7 +31,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
+  String url = ''; // add the video URL here
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,21 +42,19 @@ class _MyHomePageState extends State<MyHomePage> {
           constraints: const BoxConstraints(maxWidth: 800),
           child: M3u8PlayerWidget(
             config: PlayerConfig(
-              url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-              //url: 'https://video.apptrix.app/hls/teste_novo/index.m3u8',
+              url: url,
               autoPlay: true,
-              startPosition: 15,
               enableProgressCallback: true,
               progressCallbackInterval: 15,
               onProgressUpdate: (position) {
-                print('Posição atual: ${position.inSeconds} segundos');
+                log('Posição atual: ${position.inSeconds} segundos');
               },
               completedPercentage: 0.95,
-              onCompleted:(){
-                print('Video Done');
+              onCompleted: () {
+                log('Video Done');
               },
-              onFullscreenChanged: (isFullscreen) { 
-                print("Fullscreen changed: $isFullscreen"); 
+              onFullscreenChanged: (isFullscreen) {
+                log("Fullscreen changed: $isFullscreen");
               },
               theme: const PlayerTheme(
                 primaryColor: Colors.white,

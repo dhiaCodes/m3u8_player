@@ -4,8 +4,6 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../player_interface.dart';
 import 'dart:async';
 import '../services/m3u8_quality_service.dart';
-import '../models/player_theme.dart';
-import 'fullscreen_video_page.dart';
 
 class M3u8Player implements PlayerInterface {
   VideoPlayerController? _controller;
@@ -21,10 +19,11 @@ class M3u8Player implements PlayerInterface {
   String _originalUrl = "";
   List<VideoQuality>? _qualities;
   BuildContext? _context;
+  BuildContext? get context => _context;
   bool _isPlaying = false;
+  bool get isPlaying => _isPlaying;
   String? _currentQuality;
-
-
+  String? get currentQuality => _currentQuality ?? "Auto";
   M3u8Player({
     required this.onQualitiesUpdated,
     required this.onQualityChanged,
@@ -54,7 +53,8 @@ class M3u8Player implements PlayerInterface {
 
       if (!_hasCompleted &&
           duration.inMilliseconds > 0 &&
-          position.inMilliseconds >= (_completedPercentage * duration.inMilliseconds).toInt()) {
+          position.inMilliseconds >=
+              (_completedPercentage * duration.inMilliseconds).toInt()) {
         _hasCompleted = true;
         _onCompleted?.call();
       }
@@ -98,7 +98,8 @@ class M3u8Player implements PlayerInterface {
 
       if (!_hasCompleted &&
           duration.inMilliseconds > 0 &&
-          position.inMilliseconds >= (_completedPercentage * duration.inMilliseconds).toInt()) {
+          position.inMilliseconds >=
+              (_completedPercentage * duration.inMilliseconds).toInt()) {
         _hasCompleted = true;
         _onCompleted?.call();
       }
@@ -157,16 +158,17 @@ class M3u8Player implements PlayerInterface {
         _controller?.addListener(() {
           final position = _controller?.value.position ?? Duration.zero;
           onPositionChanged(position);
-        
+
           final duration = _controller?.value.duration ?? Duration.zero;
           onDurationChanged(duration);
-        
+
           final buffered = position + const Duration(seconds: 10);
           onBufferedChanged(buffered);
-        
+
           if (!_hasCompleted &&
               duration.inMilliseconds > 0 &&
-              position.inMilliseconds >= (_completedPercentage * duration.inMilliseconds).toInt()) {
+              position.inMilliseconds >=
+                  (_completedPercentage * duration.inMilliseconds).toInt()) {
             _hasCompleted = true;
             _onCompleted?.call();
           }
@@ -187,7 +189,8 @@ class M3u8Player implements PlayerInterface {
     }
 
     final originalUri = Uri.parse(_originalUrl);
-    final basePath = originalUri.path.substring(0, originalUri.path.lastIndexOf('/') + 1);
+    final basePath =
+        originalUri.path.substring(0, originalUri.path.lastIndexOf('/') + 1);
     final baseUri = originalUri.replace(path: basePath);
     final newUrl = baseUri.resolve(selected.relativeUrl).toString();
 
@@ -199,16 +202,17 @@ class M3u8Player implements PlayerInterface {
     _controller?.addListener(() {
       final position = _controller?.value.position ?? Duration.zero;
       onPositionChanged(position);
-    
+
       final duration = _controller?.value.duration ?? Duration.zero;
       onDurationChanged(duration);
-    
+
       final buffered = position + const Duration(seconds: 10);
       onBufferedChanged(buffered);
-    
+
       if (!_hasCompleted &&
           duration.inMilliseconds > 0 &&
-          position.inMilliseconds >= (_completedPercentage * duration.inMilliseconds).toInt()) {
+          position.inMilliseconds >=
+              (_completedPercentage * duration.inMilliseconds).toInt()) {
         _hasCompleted = true;
         _onCompleted?.call();
       }
@@ -224,7 +228,7 @@ class M3u8Player implements PlayerInterface {
     if (onFullscreenChanged != null) {
       onFullscreenChanged!(true);
     }
-  }  
+  }
 
   @override
   void exitFullscreen() {
