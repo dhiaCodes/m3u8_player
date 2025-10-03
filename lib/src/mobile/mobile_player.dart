@@ -5,25 +5,77 @@ import '../player_interface.dart';
 import 'dart:async';
 import '../services/m3u8_quality_service.dart';
 
+/// Mobile implementation of the M3U8 player using Flutter's video_player package.
+/// 
+/// This implementation provides native video playback capabilities for Android and iOS
+/// platforms with features like quality selection, fullscreen support, and
+/// completion tracking.
 class M3u8Player implements PlayerInterface {
+  /// The underlying video player controller.
   VideoPlayerController? _controller;
+  
+  /// Callback fired when available qualities are updated.
   final Function(List<String>) onQualitiesUpdated;
+  
+  /// Callback fired when the current quality changes.
   final Function(String) onQualityChanged;
+  
+  /// Callback fired when the video duration changes.
   final Function(Duration) onDurationChanged;
+  
+  /// Callback fired when the playback position changes.
   final Function(Duration) onPositionChanged;
+  
+  /// Callback fired when the buffered duration changes.
   final Function(Duration) onBufferedChanged;
+  
+  /// Callback fired when fullscreen state changes.
   final Function(bool)? onFullscreenChanged;
+  
+  /// Whether the video has reached the completion percentage.
   bool _hasCompleted = false;
+  
+  /// The percentage of video completion to trigger the onCompleted callback.
   double _completedPercentage = 1.0;
+  
+  /// Callback fired when the video reaches the completion percentage.
   Function()? _onCompleted;
+  
+  /// The original M3U8 URL.
   String _originalUrl = "";
+  
+  /// List of available video qualities.
   List<VideoQuality>? _qualities;
+  
+  /// The current build context for UI operations.
   BuildContext? _context;
+  
+  /// Gets the current build context.
   BuildContext? get context => _context;
+  
+  /// Whether the video is currently playing.
   bool _isPlaying = false;
+  
+  /// Gets whether the video is currently playing.
   bool get isPlaying => _isPlaying;
+  
+  /// The currently selected quality.
   String? _currentQuality;
+  
+  /// Gets the currently selected quality, defaulting to "Auto".
   String? get currentQuality => _currentQuality ?? "Auto";
+  /// Creates a new M3U8 player instance.
+  /// 
+  /// Parameters:
+  /// - [onQualitiesUpdated]: Called when available qualities are discovered
+  /// - [onQualityChanged]: Called when the selected quality changes
+  /// - [onDurationChanged]: Called when the video duration is available
+  /// - [onPositionChanged]: Called when the playback position updates
+  /// - [onBufferedChanged]: Called when the buffered duration changes
+  /// - [onFullscreenChanged]: Called when fullscreen state changes
+  /// - [onCompleted]: Called when video reaches completion percentage
+  /// - [completedPercentage]: Completion threshold (0.0 to 1.0)
+  /// - [context]: Build context for UI operations
   M3u8Player({
     required this.onQualitiesUpdated,
     required this.onQualityChanged,
@@ -64,6 +116,7 @@ class M3u8Player implements PlayerInterface {
     onQualityChanged('Auto');
   }
 
+  /// Updates the build context for UI operations.
   void updateContext(BuildContext context) {
     _context = context;
   }
@@ -71,7 +124,7 @@ class M3u8Player implements PlayerInterface {
   @override
   VideoPlayerController get controller {
     if (_controller == null) {
-      throw StateError('Controller não foi inicializado');
+      throw StateError('Controller has not been initialized');
     }
     return _controller!;
   }

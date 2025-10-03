@@ -38,34 +38,36 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(title: const Text('M3U8 Player Demo')),
       backgroundColor: const Color.fromARGB(221, 255, 255, 255),
       body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 800),
-          child: M3u8PlayerWidget(
-            config: PlayerConfig(
-              url: url,
-              autoPlay: true,
-              enableProgressCallback: true,
-              progressCallbackInterval: 15,
-              onProgressUpdate: (position) {
-                log('Posição atual: ${position.inSeconds} segundos');
-              },
-              completedPercentage: 0.95,
-              onCompleted: () {
-                log('Video Done');
-              },
-              onFullscreenChanged: (isFullscreen) {
-                log("Fullscreen changed: $isFullscreen");
-              },
-              theme: const PlayerTheme(
-                primaryColor: Colors.white,
-                progressColor: Colors.red,
-                backgroundColor: Colors.black54,
-                bufferColor: Colors.white24,
-                iconSize: 32.0,
+        child: url.isEmpty
+            ? const Text('Please provide a valid M3U8 URL.')
+            : Container(
+                constraints: const BoxConstraints(maxWidth: 800),
+                child: M3u8PlayerWidget(
+                  config: PlayerConfig(
+                    url: url,
+                    autoPlay: true,
+                    enableProgressCallback: true,
+                    progressCallbackInterval: 15,
+                    onProgressUpdate: (position) {
+                      log('Posição atual: ${position.inSeconds} segundos');
+                    },
+                    completedPercentage: 0.95,
+                    onCompleted: () {
+                      log('Video Done');
+                    },
+                    onFullscreenChanged: (isFullscreen) {
+                      log("Fullscreen changed: $isFullscreen");
+                    },
+                    theme: const PlayerTheme(
+                      primaryColor: Colors.white,
+                      progressColor: Colors.red,
+                      backgroundColor: Colors.black54,
+                      bufferColor: Colors.white24,
+                      iconSize: 32.0,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
       ),
     );
   }

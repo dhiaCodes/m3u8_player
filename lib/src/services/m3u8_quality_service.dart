@@ -2,12 +2,24 @@ import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 
+/// Represents a video quality variant found in an M3U8 playlist.
+/// 
+/// Each quality variant typically corresponds to a different resolution
+/// and bitrate combination available in the HLS stream.
 class VideoQuality {
+  /// Display name for this quality (e.g., "720p", "1080p").
   final String qualityName;
+  
+  /// Resolution string in format "widthxheight" (e.g., "1280x720").
   final String resolution;
+  
+  /// Relative URL path to this quality's playlist file.
   final String relativeUrl;
+  
+  /// Bandwidth requirement in bits per second for this quality.
   final int bandwidth;
 
+  /// Creates a new video quality instance.
   VideoQuality({
     required this.qualityName,
     required this.resolution,
@@ -16,13 +28,26 @@ class VideoQuality {
   });
 }
 
+/// Service class for parsing M3U8 playlists and extracting video quality information.
+/// 
+/// This service downloads and parses HLS master playlists to discover
+/// available video quality variants with their resolutions and bitrates.
 class M3u8QualityService {
+  /// Extracts a quality name from a resolution string.
+  /// 
+  /// Converts resolution strings like "1280x720" to quality names like "720p".
   String _extractQualityFromResolution(String resolution) {
-    //print('Extracting quality from resolution: $resolution');
     final height = resolution.split('x').last;
     return '${height}p';
   }
 
+  /// Fetches and parses video qualities from an M3U8 playlist URL.
+  /// 
+  /// Downloads the master playlist from [url] and extracts all available
+  /// quality variants with their metadata.
+  /// 
+  /// Returns a list of [VideoQuality] objects, or throws an exception
+  /// if the playlist cannot be downloaded or parsed.
   Future<List<VideoQuality>> fetchQualities(String url) async {
     // print('Fetching qualities from URL: $url');
     final response = await http.get(Uri.parse(url));

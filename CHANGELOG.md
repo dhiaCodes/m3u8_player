@@ -18,12 +18,6 @@ This is a fork of the original m3u8_player with significant improvements and enh
 - Multiple web-related bugs that affected video playback
 - Compatibility issues with latest Flutter and Dart versions
 - Mobile platform rendering and control issues
-- Memory leaks in web implementation
-
-### 🔄 Changed
-- Package name changed to `m3u8_player_plus` to distinguish from original
-- Updated to modern Flutter plugin architecture
-- Improved code structure and organization
 
 ### 📝 Attribution
 This package is based on the original work by [Helio Mendes](https://github.com/MendesCorporation/m3u8_player). We thank the original author for their contribution to the Flutter community.

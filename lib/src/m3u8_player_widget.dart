@@ -17,11 +17,35 @@ import 'player_impl.dart';
 //import 'mobile/mobile_player.dart';
 //import 'web/web_player.dart' if (dart.library.io) 'stubs/web_stub.dart';
 
-/// Widget principal do player M3U8
+/// Main M3U8 player widget that provides a customizable video player interface.
+/// 
+/// This widget automatically adapts to the platform, using the appropriate
+/// implementation for web (HLS.js) or mobile (video_player) platforms.
+/// 
+/// Features include:
+/// - Automatic quality selection and manual quality switching
+/// - Fullscreen support with orientation handling
+/// - Customizable UI theme
+/// - Progress tracking and completion callbacks
+/// - Cross-platform compatibility
+/// 
+/// Example usage:
+/// ```dart
+/// M3u8PlayerWidget(
+///   config: PlayerConfig(
+///     url: 'https://example.com/playlist.m3u8',
+///     autoPlay: true,
+///     theme: PlayerTheme(primaryColor: Colors.blue),
+///   ),
+/// )
+/// ```
 class M3u8PlayerWidget extends StatefulWidget {
-  /// Configuração do player
+  /// Configuration object containing all player settings and callbacks.
   final PlayerConfig config;
 
+  /// Creates a new M3U8 player widget.
+  /// 
+  /// The [config] parameter is required and must contain a valid HLS URL.
   const M3u8PlayerWidget({
     super.key,
     required this.config,
