@@ -1,6 +1,6 @@
 name: m3u8_player_plus
 description: An enhanced Flutter package that provides a customizable M3U8 player for mobile and web platforms with improved mobile support and modern web APIs.
-version: 1.0.0
+version: 1.0.1
 homepage:
 repository: https://github.com/dhiaCodes/m3u8_player
 topics:
