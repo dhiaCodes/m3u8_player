@@ -5,7 +5,7 @@ homepage:
 repository: https://github.com/dhiaCodes/m3u8_player
 topics:
   - video
-  - video_player
+  - video-player
   - m3u8
 
 environment:
