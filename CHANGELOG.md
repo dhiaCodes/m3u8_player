@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.0.1] - 2025-01-03
+
+- Converted all Portuguese comments to English
+- Fixed dartdoc warnings that were affecting the pub.dev documentation score
+
 ## [v1.0.0] - 2025-01-03
 
 ### 🚀 Major Release - Enhanced Fork
