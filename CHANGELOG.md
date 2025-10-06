@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.0.2] - 2025-10-06
+
+- Resolved "setState() called after dispose()" exception that occurred when the widget was disposed while async operations were still running
+
 ## [v1.0.1] - 2025-01-03
 
 - Converted all Portuguese comments to English

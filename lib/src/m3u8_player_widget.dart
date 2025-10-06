@@ -18,17 +18,17 @@ import 'player_impl.dart';
 //import 'web/web_player.dart' if (dart.library.io) 'stubs/web_stub.dart';
 
 /// Main M3U8 player widget that provides a customizable video player interface.
-/// 
+///
 /// This widget automatically adapts to the platform, using the appropriate
 /// implementation for web (HLS.js) or mobile (video_player) platforms.
-/// 
+///
 /// Features include:
 /// - Automatic quality selection and manual quality switching
 /// - Fullscreen support with orientation handling
 /// - Customizable UI theme
 /// - Progress tracking and completion callbacks
 /// - Cross-platform compatibility
-/// 
+///
 /// Example usage:
 /// ```dart
 /// M3u8PlayerWidget(
@@ -44,7 +44,7 @@ class M3u8PlayerWidget extends StatefulWidget {
   final PlayerConfig config;
 
   /// Creates a new M3U8 player widget.
-  /// 
+  ///
   /// The [config] parameter is required and must contain a valid HLS URL.
   const M3u8PlayerWidget({
     super.key,
@@ -70,6 +70,13 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
   double _volume = 1.0;
   double _playbackSpeed = 1.0;
   Timer? _progressTimer;
+
+  /// Safe setState that checks if the widget is still mounted before calling setState
+  void _safeSetState(VoidCallback fn) {
+    if (mounted) {
+      setState(fn);
+    }
+  }
 
   @override
   void initState() {
@@ -132,22 +139,22 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
     log("DEBUG: Initializing player for URL: ${widget.config.url}");
     _player = createPlayer(
       onQualitiesUpdated: (qualities) {
-        setState(() => _qualities = qualities);
+        _safeSetState(() => _qualities = qualities);
       },
       onQualityChanged: (quality) {
-        setState(() => _currentQuality = quality);
+        _safeSetState(() => _currentQuality = quality);
       },
       onDurationChanged: (duration) {
-        setState(() => _duration = duration);
+        _safeSetState(() => _duration = duration);
       },
       onPositionChanged: (position) {
-        setState(() => _position = position);
+        _safeSetState(() => _position = position);
       },
       onBufferedChanged: (buffered) {
-        setState(() => _buffered = buffered);
+        _safeSetState(() => _buffered = buffered);
       },
       onCompleted: () {
-        setState(() => _isPlaying = false);
+        _safeSetState(() => _isPlaying = false);
         log("DEBUG: Video completed callback triggered.");
         if (widget.config.onCompleted != null) {
           widget.config.onCompleted!();
@@ -157,7 +164,7 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
     );
 
     await _player.initialize(widget.config.url);
-    setState(() => _isInitialized = true);
+    _safeSetState(() => _isInitialized = true);
 
     if (widget.config.startPosition > 0) {
       _player.seekTo(Duration(seconds: widget.config.startPosition));
@@ -169,7 +176,7 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
   }
 
   void _playPause() {
-    setState(() => _isPlaying = !_isPlaying);
+    _safeSetState(() => _isPlaying = !_isPlaying);
     if (_isPlaying) {
       _player.play();
     } else {
@@ -181,7 +188,7 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
     log("DEBUG: Toggling fullscreen..");
     if (kIsWeb) {
       final webPlayer = _player as M3u8Player;
-      setState(() => _isFullScreen = web.document.fullscreen);
+      _safeSetState(() => _isFullScreen = web.document.fullscreen);
       log("DEBUG: Toggling fullscreen. Current state: $_isFullScreen");
       if (!_isFullScreen) {
         webPlayer.enterFullscreen();
@@ -191,7 +198,7 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
     } else {
       // For mobile: navigate to a new fullscreen page
       final mobilePlayer = _player as M3u8Player;
-      setState(() => _isFullScreen = true);
+      _safeSetState(() => _isFullScreen = true);
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.landscapeLeft,
@@ -206,28 +213,24 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
             controller: mobilePlayer.controller,
             onExitFullscreen: () {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) {
-                  setState(() {
-                    _isFullScreen = false;
-                  });
-                  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-                  SystemChrome.setPreferredOrientations(
-                      [DeviceOrientation.portraitUp]);
-                  if (widget.config.onFullscreenChanged != null) {
-                    widget.config.onFullscreenChanged!(false);
-                  }
-                  Future.delayed(const Duration(seconds: 2), () {
-                    if (mounted) {
-                      setState(() {});
-                      SystemChrome.setPreferredOrientations([
-                        DeviceOrientation.portraitUp,
-                        DeviceOrientation.landscapeLeft,
-                        DeviceOrientation.landscapeRight,
-                      ]);
-                      // Deixe o didChangeMetrics detectar mudanças futuras para disparar o fullscreen.
-                    }
-                  });
+                _safeSetState(() {
+                  _isFullScreen = false;
+                });
+                SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+                SystemChrome.setPreferredOrientations(
+                    [DeviceOrientation.portraitUp]);
+                if (widget.config.onFullscreenChanged != null) {
+                  widget.config.onFullscreenChanged!(false);
                 }
+                Future.delayed(const Duration(seconds: 2), () {
+                  _safeSetState(() {});
+                  SystemChrome.setPreferredOrientations([
+                    DeviceOrientation.portraitUp,
+                    DeviceOrientation.landscapeLeft,
+                    DeviceOrientation.landscapeRight,
+                  ]);
+                  // Deixe o didChangeMetrics detectar mudanças futuras para disparar o fullscreen.
+                });
               });
             },
             onSeek: _player.seekTo,
@@ -238,11 +241,11 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
             qualities: _qualities,
             currentQuality: _currentQuality,
             onVolumeChanged: (vol) {
-              setState(() => _volume = vol);
+              _safeSetState(() => _volume = vol);
               _player.setVolume(vol);
             },
             onSpeedChanged: (speed) {
-              setState(() => _playbackSpeed = speed);
+              _safeSetState(() => _playbackSpeed = speed);
               _player.setPlaybackSpeed(speed);
             },
             onQualityChanged: (quality) async {
@@ -392,11 +395,11 @@ class _M3u8PlayerWidgetState extends State<M3u8PlayerWidget>
       onPlayPause: _playPause,
       onSeek: _player.seekTo,
       onVolumeChanged: (volume) {
-        setState(() => _volume = volume);
+        _safeSetState(() => _volume = volume);
         _player.setVolume(volume);
       },
       onSpeedChanged: (speed) {
-        setState(() => _playbackSpeed = speed);
+        _safeSetState(() => _playbackSpeed = speed);
         _player.setPlaybackSpeed(speed);
       },
       onQualityChanged: (quality) {
