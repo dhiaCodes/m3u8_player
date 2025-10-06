@@ -7,7 +7,7 @@ topics:
   - video
   - video-player
   - m3u8
-  - HLS
+  - hls
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
